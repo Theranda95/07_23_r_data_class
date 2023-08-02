@@ -111,5 +111,81 @@ list_rl1$Stats[3]
 #or
 list_rl1[[2]][3]
 
+#-----------------------Adding and Deleting components -----------------------------
+
+list_rl1 
+#How to add new components to the list 
+list_rl1[4] <- "New Information" 
+list_rl1 
+
+#Another way to add a component ($): 
+#Vector:      All hours where utilization is unknown (NA's)
+
+  #First find the hours 
+RL1[is.na(RL1$utilization),] 
+  #We want the hours 
+RL1[is.na(RL1$utilization),"PosixTime"]
+  #Add it to the list 
+list_rl1$UnknownHours <- RL1[is.na(RL1$utilization),"PosixTime"]
+list_rl1
+
+#Remove a component: Use the NULL method 
+list_rl1[4] <- NULL
+list_rl1  ###numeration has shifted when component deleted - unlike data frames 
+
+#Dataframe:   For this machine 
+list_rl1$Data <- RL1
+list_rl1
+summary(list_rl1)
+str(list_rl1)
+
+#----------------------- Subsetting a List --------------------------------------
+#Getting the first hour of the unknown utilization 
+list_rl1[[4]][1]
+list_rl1$UnknownHours[1]
+  #list_rl1$UnknownHours[1,] -- this does not work for lists 
+
+#What is the difference between subsetting and extracting 
+
+list_rl1[1:2] #gives us a list with two components 
+list_rl1[c(1,4)]
+
+sublist_rl1 <- list_rl1[c("Machine","Stats")]
+sublist_rl1
+
+sublist_rl1[[2]][2]
+sublist_rl1$Stats[2] #same thing 
+
+#Double square brackets are NOT for subsetting:
+#list_rl1[[1:2]] #ERROR
+
+#---------------------Building a timeseries Plot--------------------------------------
+
+library(ggplot2)
+
+p <- ggplot(data=util)
+p + geom_line(aes(x=PosixTime, y=utilization,
+                  color=Machine), size=1.2) +
+#size is not being mapped to the variables so we add it outside of the aes
+    facet_grid(Machine~.) +
+#Adding a horizonal line at the threshold 
+    geom_hline(yintercept=0.9,
+               color="Gray", size=1.2,
+               linetype=3)
+#Save the plot into the object 
+myplot <- p + geom_line(aes(x=PosixTime, y=utilization,
+                            color=Machine), size=1.2) +
+  facet_grid(Machine~.) +
+  geom_hline(yintercept=0.9,
+             color="Gray", size=1.2,
+             linetype=3)
+
+#Add this to our list 
+list_rl1$Plot <- myplot
+list_rl1 #Prints the plot 
+
+
+
+
 
 
