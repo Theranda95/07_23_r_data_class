@@ -2,6 +2,7 @@
 library(data.table) #needed to run function
 library(dplyr) #needed to combine matrices 
 library(ggplot2) #needed for graphing 
+
 library(ggpubr) #needed for stats tests 
 
 getwd()
@@ -29,7 +30,7 @@ SanFrancisco <- as.matrix(SanFrancisco)
 is.matrix(Chicago)
 
 #Lets put all of this into a list: 
-Weather <- list(Chicago=Chicago, NewYork=NewYork,Houston=Houston,SanFrancisco=SanFrancisco)
+Weather <- list(Chicago=Chicago, NewYork=NewYork, Houston=Houston, SanFrancisco=SanFrancisco)
 Weather
 
 Weather[3] #as a list 
@@ -144,9 +145,75 @@ lapply(Weather, "[", ,1) #the whole column for each element
   #and we apply the rowMeans function to that matrix and the output 
   #is a list with those results 
     lapply(Weather, rowMeans) #we can replace the rowMeans with our function
-lapply(Weather, function(x)   ) #x is the argument and anything outside of function and in between the bracket is the body of the function 
+lapply(Weather, function(x) x[1, ]) #x is the argument and anything outside of function and in between the bracket is the body of the function 
+lapply(Weather, function(x) x[5, ])
 
-                          
+lapply(Weather, function(z) z[1,] - z[2,])                      
+lapply(Weather, function(z) round((z[1,] - z[2,])/z[2,], 2)) 
+
+##---------------------- Using sapply() ------------------------------------------
+?sapply() #simplifies the output
+Weather
+#AvgHigh_F for July: 
+lapply(Weather, "[",1,7) #returns a list 
+sapply(Weather, "[",1,7) #returns a vector - puts the values into a vector 
+#AvgHigh_F for 4th quarter: 
+lapply(Weather, "[", 1, 10:12)
+sapply(Weather, "[", 1, 10:12)
+#Another example:
+lapply(Weather, rowMeans)
+sapply(Weather, rowMeans)
+round(sapply(Weather, rowMeans),2)
+#Another example:
+lapply(Weather, function(z) round((z[1,] - z[2,])/z[2,], 2)) 
+sapply(Weather, function(z) round((z[1,] - z[2,])/z[2,], 2)) #puts the data into a matrix 
+#By the way: 
+sapply(Weather, rowMeans, simplify=F) #same as the lapply
+
+
+##---------------------- Nesting apply functions ------------------------------------------
+Weather 
+lapply(Weather, rowMeans) #theres no predefined function to look at row max or row min 
+
+#we need t create our own function for rowmax/min 
+#lets do it for just one matrix 
+Chicago
+apply(Chicago, rowMeans)
+apply(Chicago,1, max)
+#applying to every single matrix - across the whole list 
+lapply(Weather, apply ,1, max) #No need for Chicago bc the apply function will iterate along the elements of the matrix 
+lapply(Weather, function(x) apply(x, 1, max))
+#tidy up 
+sapply(Weather, apply ,1, max) 
+sapply(Weather, apply ,1, min) 
+
+##---------------------- which.max and which.min ------------------------------------------
+#Very advanced tutorial 
+#How do we create a matrix as the one below 
+sapply(Weather, apply ,1, max) 
+#But instead of the numbers we want to know the months 
+?which.max
+Chicago[1,]
+which.max(Chicago[1,]) #returns a named vector
+names(which.max(Chicago[1,]))
+#We need to add iterations 
+#By the sounds of it we will need apply() to iterate over rows of the matrix 
+#lapply and sapply to iterate over the list 
+apply(Chicago, 1, function(x) names(which.max(x)))
+#Now we need to iterate the whole upper construct over our whole list 
+lapply(Weather, function(y) apply(y, 1, function(x) names(which.max(x))))
+sapply(Weather, function(y) apply(y, 1, function(x) names(which.max(x))))
+
+##END OF THE SECTION 
+
+
+
+
+
+
+
+
+
 
 
 
